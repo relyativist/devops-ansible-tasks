@@ -1,0 +1,59 @@
+---
+- hosts: all
+  tasks:
+  - name: Install httpd
+    yum:
+      name: httpd
+      state: latest
+      update_cache: yes
+    become: yes
+    notify: 
+      - Apache start
+
+  - name: Install firewalld
+    yum:
+      name: firewalld
+      state: latest
+      update_cache: yes
+    become: yes
+    notify:
+      - Firewalld start
+
+  - name: Create index.html
+    copy:
+      dest: "/var/www/html/index.html"
+      content: |
+        Welcome to my web server
+    become: yes
+    notify:
+      - Apache reload
+      - Enable ports
+
+  handlers:
+  - name: Apache start
+    service:
+      name: "httpd"
+      state: started
+    become: yes
+  
+  - name: Apache reload
+    service:
+      name: "httpd"
+      state: reloaded
+      enabled: yes
+    become: yes
+
+  - name: Firewalld start
+    service: 
+      name: "firewalld"
+      state: started
+      enabled: yes
+    become: yes
+
+  - name: Enable ports
+    firewalld:
+      port: "80/tcp"
+      state: enabled
+      permanent: yes
+    become: yes
+

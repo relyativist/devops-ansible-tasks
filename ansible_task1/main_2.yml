@@ -1,0 +1,26 @@
+---
+- hosts: all
+  tasks:
+  - name: Remove httpd
+    yum:
+      name: httpd
+      state: removed
+    become: yes
+
+  - name: Remove index.html
+    file:
+      path: /var/www/html/index.html
+      state: absent
+    become: yes
+    notify:
+         - Disable ports 
+
+  handlers:
+  - name: Disable ports
+    firewalld:
+      port: "80/tcp"
+      state: disabled
+      permanent: yes
+    become: yes
+
+

@@ -1,0 +1,1 @@
+{"rsync":{"/vagrant":{"type":"rsync","guestpath":"/vagrant","hostpath":"/Users/vyacheslav/code/epam_devops_course/2_ansible","disabled":false,"__vagrantfile":true,"owner":"vagrant","group":"vagrant"}}}

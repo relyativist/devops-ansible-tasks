@@ -1,0 +1,15 @@
+- hosts: all
+  tasks:
+    - name: line replace
+      lineinfile:
+        path: /etc/default/grub
+        regex: 'GRUB_CMDLINE_LINUX'
+        line: 'GRUB_CMDLINE_LINUX="net.ifnames=0 biosdevname=0"'
+        state: present
+      become: yes
+       
+
+    - name: Write grub configuration file
+      command: grub2-mkconfig -o /etc/default/grub 
+      become: yes
+
