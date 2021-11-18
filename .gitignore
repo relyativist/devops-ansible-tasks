@@ -1,3 +1,3 @@
 Vagrantfile
 init_on_machines.txt
-.vagrant
+.vagrant/
