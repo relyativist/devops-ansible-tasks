@@ -1,0 +1,52 @@
+- name: Create random passwords and store
+  hosts: all
+  gather_facts: no
+  vars_files:
+    - vars/users
+  vars:
+    users_with_pass_file: /home/vagrant/vars/test_pass.txt
+
+  tasks:
+    - name: Try to load users and passwords from file if it exists
+      vars:
+        file_content: "{{ lookup('ansible.builtin.file', users_with_pass_file, errors='ignore') }}"
+      ansible.builtin.set_fact:
+        users_with_pass: "{{ file_content }}"
+      when:
+        - file_content | length > 0
+        # Unfortunately, there is no test 'is list' in jinja2...
+        - file_content is iterable
+        - file_content is not mapping
+        - file_content is not string
+      ignore_errors: true
+      changed_when: false
+      register: load_from_disk
+
+    - name: Create user list with passwords and store it if it does not exists (or is malformed...)
+      block:
+        - name: Create the list
+          vars:
+            user_password: "{{ lookup('ansible.builtin.password', '/dev/null', length=12) }}"
+          ansible.builtin.set_fact:
+            users_with_pass: "{{ users_with_pass | default([]) + [item | combine({'password': user_password})] }}"
+          with_dict: "{{ users }}"
+
+        - name: create file
+          file:
+            dest: /home/vagrant/vars/test_pass.txt
+            state: touch
+          delegate_to: localhost
+
+        - name: Store the result
+          copy:
+            dest: "{{ users_with_pass_file }}"
+            content: "{{ users_with_pass | to_json }}"
+          delegate_to: localhost
+
+
+      when: load_from_disk is skipped or load_from_disk is failed
+
+    - name: Show the result
+      ansible.builtin.debug:
+        var: users_with_pass
+
