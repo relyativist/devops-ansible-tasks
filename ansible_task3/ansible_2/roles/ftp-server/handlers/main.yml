@@ -1,0 +1,9 @@
+---
+# handlers file for roles/ftp-server
+- name: run restorecon
+  command: restorecon -v /var/ftp/pub
+
+- name: reload vsftpd
+  service:
+    name: vsftpd
+    state: reloaded

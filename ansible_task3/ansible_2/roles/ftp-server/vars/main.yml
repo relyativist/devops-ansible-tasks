@@ -1,0 +1,15 @@
+---
+# vars file for roles/ftp-server
+packages:
+  - vsftpd
+  - firewalld
+  - python3-policycoreutils
+
+services:
+  - vsftpd
+  - firewalld 
+
+fileperms:
+  - /var/ftp/pub
+  - /var/ftp/pub/upload
+vsftpd_config_file: /etc/vsftpd/vsftpd.conf

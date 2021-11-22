@@ -1,0 +1,6 @@
+- name: Install FTP and run with config
+  hosts: all
+  become: true
+  roles:
+    - ftp-server
+

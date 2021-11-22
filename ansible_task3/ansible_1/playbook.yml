@@ -1,0 +1,6 @@
+- name: Install nginx and uploads configs
+  hosts: all
+  become: true
+  roles:
+    - apache
+    - firewall

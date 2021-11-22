@@ -1,0 +1,19 @@
+---
+# handlers file for roles/firewall
+- name: Firewalld start
+  service:
+    name: "firewalld"
+    state: started
+    enabled: yes
+
+- name: Enable ports
+  firewalld:
+    port: "80/tcp"
+    state: enabled
+    permanent: yes
+
+- name: Apache reload
+  service:
+    name: "httpd"
+    state: reloaded
+    enabled: yes

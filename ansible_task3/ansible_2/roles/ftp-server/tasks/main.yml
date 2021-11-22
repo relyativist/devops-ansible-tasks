@@ -1,0 +1,56 @@
+---
+# tasks file for roles/ftp-server
+- name: install ftpserver
+  yum:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  loop: "{{ packages }}"
+
+- name: Copy ftp config to servers
+  template:
+    src: vsftpd.conf.j2
+    dest: /etc/vsftpd/vsftpd.conf
+  notify:
+    - reload vsftpd
+
+- name: allow permissions to pub directory
+  file:
+    path: /var/ftp/pub
+    state: directory
+    mode: 0755
+
+- name: allow to rwx permission to pub directory
+  file:
+    path: /var/ftp/pub/upload
+    state: directory
+    mode: 0777
+  
+- name: Anonymous selinux write
+  seboolean:
+    name: ftpd_anon_write
+    state: true
+    persistent: yes
+
+- name: Set SElinux file context
+  sefcontext:
+    target: "{{ item }}"
+    setype: public_content_rw_t
+    state: present
+  loop: "{{ fileperms }}" 
+  notify:
+    - run restorecon
+
+- name: Open firewall ports for FTP
+  firewalld:
+    service: ftp
+    permanent: yes
+    state: enabled
+    immediate: yes
+
+- name: Make sure services are started and enabled
+  service:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop: "{{ services }}"

@@ -1,0 +1,18 @@
+---
+# tasks file for roles/firewall
+- name: Install firewalld
+  yum:
+    name: firewalld
+    state: latest
+    update_cache: yes
+  notify:
+    - Firewalld start
+
+- name: Create index.html
+  copy:
+    dest: "/var/www/html/index.html"
+    content: |
+      {{ index_content }}
+  notify:
+    - Apache reload
+    - Enable ports
